@@ -1,0 +1,142 @@
+local Translations = {
+    --["这里填要替换的英文"] = "这里填中文",
+    ["Steal a Brainot - Chilli Hub"] = "窃取脑腐物品 - 辣椒枢纽",
+    ["Shop"] = "商店",
+    ["Select Items to Buy"] = "选择要购买的物品",
+    ["Auto Buy Item"] = "自动购买物品",
+    ["Farm"] = "刷取",
+    ["Min money per sec to buy"] = "每秒最低购买资金",
+    ["Auto buy Brainrot"] = "自动购买脑腐物品",
+    ["Anti AFK"] = "防挂机",
+    ["Auto Lock Base"] = "自动锁定基地",
+    ["Auto Collect"] = "自动收集",
+    ["Collect Delay (minutes)"] = "收集延迟（分钟）",
+    ["e.g. 3"] = "例如 3",
+    ["Desync (Need 7 rebirths) — V keybind"] = "不同步（需要7次重生）——按键V",
+    ["Steal Upstairs — Y keybind"] = "楼上窃取——按键Y",
+    ["Auto Steal Nearest Brainrot"] = "自动窃取最近的脑腐物品",
+    ["Auto kick on steal"] = "窃取时自动踢出",
+    ["Aimbot"] = "自动瞄准",
+    ["Highest Value Brainrot ESP"] = "最高价值脑腐物品透视",
+    ["Timer ESP"] = "计时透视",
+    ["Player ESP"] = "玩家透视",
+    ["Anti Ragdoll"] = "防布娃娃状态",
+    ["Speed boost (3 rebirth require, Q keybind..."] = "速度提升（需要3次重生，按键Q...",
+    ["Infinity Jump"] = "无限跳跃",
+    ["Chilli Booster UI"] = "辣椒增益界面"
+}
+
+local function translateText(text)
+    if not text or type(text) ~= "string" then return text end
+    
+    if Translations[text] then
+        return Translations[text]
+    end
+    
+    for en, cn in pairs(Translations) do
+        if text:find(en) then
+            return text:gsub(en, cn)
+        end
+    end
+    
+    return text
+end
+
+local function setupTranslationEngine()
+    local success, err = pcall(function()
+        local oldIndex = getrawmetatable(game).__newindex
+        setreadonly(getrawmetatable(game), false)
+        
+        getrawmetatable(game).__newindex = newcclosure(function(t, k, v)
+            if (t:IsA("TextLabel") or t:IsA("TextButton") or t:IsA("TextBox")) and k == "Text" then
+                v = translateText(tostring(v))
+            end
+            return oldIndex(t, k, v)
+        end)
+        
+        setreadonly(getrawmetatable(game), true)
+    end)
+    
+    if not success then
+        warn("元表劫持失败:", err)
+       
+        local translated = {}
+        local function scanAndTranslate()
+            for _, gui in ipairs(game:GetService("CoreGui"):GetDescendants()) do
+                if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                    pcall(function()
+                        local text = gui.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                gui.Text = translatedText
+                                translated[gui] = true
+                            end
+                        end
+                    end)
+                end
+            end
+            
+            local player = game:GetService("Players").LocalPlayer
+            if player and player:FindFirstChild("PlayerGui") then
+                for _, gui in ipairs(player.PlayerGui:GetDescendants()) do
+                    if (gui:IsA("TextLabel") or gui:IsA("TextButton") or gui:IsA("TextBox")) and not translated[gui] then
+                        pcall(function()
+                            local text = gui.Text
+                            if text and text ~= "" then
+                                local translatedText = translateText(text)
+                                if translatedText ~= text then
+                                    gui.Text = translatedText
+                                    translated[gui] = true
+                                end
+                            end
+                        end)
+                    end
+                end
+            end
+        end
+        
+        local function setupDescendantListener(parent)
+            parent.DescendantAdded:Connect(function(descendant)
+                if descendant:IsA("TextLabel") or descendant:IsA("TextButton") or descendant:IsA("TextBox") then
+                    task.wait(0.1)
+                    pcall(function()
+                        local text = descendant.Text
+                        if text and text ~= "" then
+                            local translatedText = translateText(text)
+                            if translatedText ~= text then
+                                descendant.Text = translatedText
+                            end
+                        end
+                    end)
+                end
+            end)
+        end
+        
+        pcall(setupDescendantListener, game:GetService("CoreGui"))
+        local player = game:GetService("Players").LocalPlayer
+        if player and player:FindFirstChild("PlayerGui") then
+            pcall(setupDescendantListener, player.PlayerGui)
+        end
+        
+        while true do
+            scanAndTranslate()
+            task.wait(3)
+        end
+    end
+end
+
+task.wait(2)
+
+setupTranslationEngine()
+
+local success, err = pcall(function()
+--这下面填加载外部脚本
+loadstring(game:HttpGet("https://raw.githubusercontent.com/tienkhanh1/spicy/main/Chilli.lua"))()
+
+
+end)
+
+if not success then
+    warn("加载失败:", err)
+end
