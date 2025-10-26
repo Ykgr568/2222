@@ -9,9 +9,9 @@ local Translations = {
 ["Paste your key here."] = "在此处粘贴你的密钥。",
 ["Enter your key..."] = "输入你的密钥...",
 ["Check Key"] = "检查密钥",
-["Close Window"] = "关闭窗口",
-["Do you want to close this window? You will not be able to open it again."] = "你是否要关闭此窗口？关闭后将无法再次打开。",
-["Cancel"] = "取消"
+["Close Window"] = "检查肾虚",
+["Do you want to close this window? You will not be able to open it again."] = "你你是不是虚了？🤔",
+["Cancel"] = "没有啊😋"
 }
  
 local function translateText(text)
