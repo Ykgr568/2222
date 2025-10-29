@@ -2,8 +2,8 @@ local Translations = {
     ["Join Discord"] = "加入Discord",
     ["Skull Hub Key System"] = "Skull Hub 密钥系统",
     ["Enter Key Here..."] = "在此输入密钥...",
-    ["Verify Key"] = "验证密钥",
-    ["Get Key"] = "获取密钥"
+    ["Verify Key"] = "获取密钥",
+    ["Get Key"] = "输入密钥"
 }
 
 local function translateText(text)
