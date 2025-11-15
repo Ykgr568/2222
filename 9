@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>优品商城 - 您的移动购物平台</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 80px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* 顶部导航 */
+        header {
+            background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 8px;
+            font-size: 1.8rem;
+        }
+        
+        .nav-icons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-icons i {
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .nav-icons i:hover {
+            transform: scale(1.1);
+        }
+        
+        /* 搜索框 */
+        .search-box {
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            border-radius: 30px;
+            border: none;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6a11cb;
+            font-size: 1.2rem;
+        }
+        
+        /* 轮播图 */
+        .slider {
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .slides {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+        
+        .slide {
+            min-width: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .slide-1 { background: linear-gradient(to right, #ff416c, #ff4b2b); }
+        .slide-2 { background: linear-gradient(to right, #11998e, #38ef7d); }
+        .slide-3 { background: linear-gradient(to right, #654ea3, #da98b4); }
+        
+        .slide-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .slider-nav {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+        
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            cursor: pointer;
+        }
+        
+        .slider-dot.active {
+            background: white;
+        }
+        
+        /* 分类导航 */
+        .categories {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .category:hover {
+            transform: translateY(-5px);
+        }
+        
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        
+        .category-icon i {
+            font-size: 1.5rem;
+            color: #6a11cb;
+        }
+        
+        .category span {
+            font-size: 0.85rem;
+            text-align: center;
+            color: #555;
+        }
+        
+        /* 产品展示 */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 15px;
+        }
+        
+        .section-title h2 {
+            font-size: 1.4rem;
+            color: #444;
+        }
+        
+        .section-title a {
+            color: #6a11cb;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .product-img {
+            height: 140px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .product-info {
+            padding: 15px;
+        }
+        
+        .product-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+        }
+        
+        .product-price {
+            color: #ff4757;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin: 8px 0;
+        }
+        
+        .product-rating {
+            color: #ffd32a;
+            margin: 5px 0;
+        }
+        
+        .add-to-cart {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .add-to-cart:hover {
+            opacity: 0.9;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #888;
+            text-decoration: none;
+            font-size: 0.8rem;
+            transition: color 0.3s;
+        }
+        
+        .nav-item.active {
+            color: #6a11cb;
+        }
+        
+        .nav-item i {
+            font-size: 1.3rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 360px) {
+            .categories {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .products {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶部导航 -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-shopping-bag"></i>
+            <span>优品商城</span>
+        </div>
+        <div class="nav-icons">
+            <i class="fas fa-bell"></i>
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+    </header>
+    
+    <div class="container">
+        <!-- 搜索框 -->
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="搜索商品...">
+        </div>
+        
+        <!-- 轮播图 -->
+        <div class="slider">
+            <div class="slides">
+                <div class="slide slide-1">
+                    <div class="slide-content">
+                        <h3>夏季新品上市</h3>
+                        <p>精选时尚单品，限时优惠</p>
+                    </div>
+                </div>
+                <div class="slide slide-2">
+                    <div class="slide-content">
+                        <h3>数码家电狂欢节</h3>
+                        <p>爆款直降，最高省1000元</p>
+                    </div>
+                </div>
+                <div class="slide slide-3">
+                    <div class="slide-content">
+                        <h3>生鲜水果特惠</h3>
+                        <p>产地直供，新鲜直达</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-nav">
+                <div class="slider-dot active"></div>
+                <div class="slider-dot"></div>
+                <div class="slider-dot"></div>
+            </div>
+        </div>
+        
+        <!-- 分类导航 -->
+        <div class="categories">
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <span>手机数码</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <span>服装鞋包</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <span>美食生鲜</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <span>家居家装</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <span>美妆护肤</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-baby"></i>
+                </div>
+                <span>母婴玩具</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-car"></i>
+                </div>
+                <span>汽车用品</span>
+            </div>
+            <div class="category">
+                <div class="category-icon">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                <span>更多</span>
+            </div>
+        </div>
+        
+        <!-- 热卖商品 -->
+        <div class="section-title">
+            <h2>热卖商品</h2>
+            <a href="#">查看全部 <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="products">
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #ffecd2, #fcb69f);"></div>
+                <div class="product-info">
+                    <div class="product-title">无线蓝牙耳机 Pro版</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(128)</span>
+                    </div>
+                    <div class="product-price">¥299</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #a1c4fd, #c2e9fb);"></div>
+                <div class="product-info">
+                    <div class="product-title">智能运动手表</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span>(96)</span>
+                    </div>
+                    <div class="product-price">¥899</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #ff9a9e, #fad0c4);"></div>
+                <div class="product-info">
+                    <div class="product-title">便携式充电宝 20000mAh</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <span>(245)</span>
+                    </div>
+                    <div class="product-price">¥159</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #d4fc79, #96e6a1);"></div>
+                <div class="product-info">
+                    <div class="product-title">高清数码相机</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(87)</span>
+                    </div>
+                    <div class="product-price">¥2399</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新品上市 -->
+        <div class="section-title">
+            <h2>新品上市</h2>
+            <a href="#">查看全部 <i class="fas fa-chevron-right"></i></a>
+        </div>
+        
+        <div class="products">
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #fbc2eb, #a6c1ee);"></div>
+                <div class="product-info">
+                    <div class="product-title">折叠屏智能手机</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <span>(42)</span>
+                    </div>
+                    <div class="product-price">¥6999</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="product-img" style="background: linear-gradient(to right, #84fab0, #8fd3f4);"></div>
+                <div class="product-info">
+                    <div class="product-title">降噪头戴式耳机</div>
+                    <div class="product-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                        <span>(67)</span>
+                    </div>
+                    <div class="product-price">¥1299</div>
+                    <button class="add-to-cart">加入购物车</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <a href="#" class="nav-item active">
+            <i class="fas fa-home"></i>
+            <span>首页</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-search"></i>
+            <span>发现</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span>购物车</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-heart"></i>
+            <span>收藏</span>
+        </a>
+        <a href="#" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>我的</span>
+        </a>
+    </div>
+    
+    <script>
+        // 轮播图功能
+        let currentSlide = 0;
+        const slides = document.querySelector('.slides');
+        const dots = document.querySelectorAll('.slider-dot');
+        const totalSlides = document.querySelectorAll('.slide').length;
+        
+        function goToSlide(index) {
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            
+            slides.style.transform = `translateX(-${index * 100}%)`;
+            
+            // 更新指示点状态
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+            
+            currentSlide = index;
+        }
+        
+        // 自动轮播
+        setInterval(() => {
+            goToSlide(currentSlide + 1);
+        }, 5000);
+        
+        // 点击指示点切换
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                goToSlide(index);
+            });
+        });
+        
+        // 添加购物车动画效果
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+        
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                productCard.style.transform = 'scale(0.95)';
+                
+                setTimeout(() => {
+                    productCard.style.transform = '';
+                    
+                    // 创建动画元素
+                    const cartIcon = document.querySelector('.fa-shopping-cart');
+                    const rect = cartIcon.getBoundingClientRect();
+                    
+                    const animationElement = document.createElement('div');
+                    animationElement.innerHTML = '<i class="fas fa-plus"></i>';
+                    animationElement.style.position = 'fixed';
+                    animationElement.style.left = `${rect.left}px`;
+                    animationElement.style.top = `${rect.top}px`;
+                    animationElement.style.color = '#6a11cb';
+                    animationElement.style.fontSize = '20px';
+                    animationElement.style.zIndex = '1000';
+                    animationElement.style.transition = 'all 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+                    document.body.appendChild(animationElement);
+                    
+                    // 触发动画
+                    setTimeout(() => {
+                        animationElement.style.left = `${this.getBoundingClientRect().left + this.offsetWidth/2}px`;
+                        animationElement.style.top = `${this.getBoundingClientRect().top}px`;
+                        animationElement.style.transform = 'scale(2)';
+                        animationElement.style.opacity = '0';
+                    }, 10);
+                    
+                    // 移除元素
+                    setTimeout(() => {
+                        document.body.removeChild(animationElement);
+                        
+                        // 显示添加成功提示
+                        const originalText = this.textContent;
+                        this.textContent = '✓ 已添加';
+                        this.style.background = '#2ed573';
+                        
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.background = '';
+                        }, 1500);
+                    }, 800);
+                }, 200);
+            });
+        });
+        
+        // 底部导航激活状态
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                navItems.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
