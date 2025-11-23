@@ -1,0 +1,111 @@
+-- 1. 创建主界面 ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ScriptHub"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- 2. 主框架（背景+布局）
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0.8, 0, 0.8, 0)   -- 占屏幕80%宽高
+mainFrame.Position = UDim2.new(0.1, 0, 0.1, 0) -- 居中偏移
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- 深灰背景
+mainFrame.Parent = screenGui
+
+-- 3. 关闭按钮
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0.1, 0, 0.05, 0) -- 宽10%、高5%
+closeButton.Position = UDim2.new(0.85, 0, 0.05, 0) -- 右上角
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- 红色
+closeButton.Text = "×" -- 关闭文字
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- 白色文字
+closeButton.Parent = mainFrame
+closeButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy() -- 点击关闭界面
+end)
+
+-- 4. 左侧脚本列表（可滑动）
+local scriptListFrame = Instance.new("ScrollingFrame")
+scriptListFrame.Name = "ScriptListFrame"
+scriptListFrame.Size = UDim2.new(0.3, 0, 0.8, 0) -- 占主框架30%宽度
+scriptListFrame.Position = UDim2.new(0, 0, 0, 0) -- 靠左
+scriptListFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+scriptListFrame.CanvasSize = UDim2.new(0, 0, 0, 30 * #scriptButtons) -- 根据按钮数量自动撑开高度（初始示例5个按钮）
+scriptListFrame.ScrollingDirection = Enum.ScrollingDirection.Y -- 垂直滑动
+scriptListFrame.Parent = mainFrame
+
+-- 左侧列表布局（垂直排列按钮）
+local verticalLayout = Instance.new("UIListLayout")
+verticalLayout.Padding = UDim.new(0, 5) -- 按钮间距5像素
+verticalLayout.Parent = scriptListFrame
+
+-- 5. 右侧内容展示区
+local contentFrame = Instance.new("Frame")
+contentFrame.Name = "ContentFrame"
+contentFrame.Size = UDim2.new(0.7, 0, 0.8, 0) -- 占主框架70%宽度
+contentFrame.Position = UDim2.new(0.3, 0, 0, 0) -- 靠右
+contentFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+contentFrame.Parent = mainFrame
+
+
+-- ↓↓↓ 自定义配置区（需用户修改 ↓↓↓）
+-- 示例：左侧列表按钮名称（需和 ServerStorage 中脚本名称一一对应）
+local scriptButtons = {
+    "捐赠",
+    "黑名单",
+    "通用",
+    "死铁轨",
+    "999天",
+    "红色的脑子"
+}
+
+-- 脚本加载逻辑：点击按钮时，从 ServerStorage.CustomScripts 找对应脚本并克隆
+local function loadScript(scriptName)
+    -- 目标存储文件夹（需用户提前创建 ServerStorage.CustomScripts）
+    local customScriptsFolder = game:GetService("ServerStorage"):WaitForChild("CustomScripts", 10) 
+    local targetScript = customScriptsFolder:FindFirstChild(scriptName)
+    
+    if targetScript then
+        -- 判断脚本类型（服务端/客户端），插入对应服务
+        local targetService = (scriptName:find("Server") or scriptName:find("server")) 
+            and game:GetService("ServerScriptService") 
+            or game:GetService("StarterPlayerScripts")
+        
+        -- 克隆脚本到目标服务
+        targetScript:Clone().Parent = targetService
+        
+        -- 右侧显示加载成功提示
+        contentFrame:ClearAllChildren()
+        local successLbl = Instance.new("TextLabel")
+        successLbl.Size = UDim2.new(1, 0, 0.2, 0)
+        successLbl.Position = UDim2.new(0, 0, 0, 0)
+        successLbl.Text = "✅ 脚本 ["..scriptName.."] 加载成功！"
+        successLbl.TextColor3 = Color3.fromRGB(0, 255, 0)
+        successLbl.BackgroundTransparency = 1
+        successLbl.Parent = contentFrame
+    else
+        -- 右侧显示脚本未找到提示
+        contentFrame:ClearAllChildren()
+        local errorLbl = Instance.new("TextLabel")
+        errorLbl.Size = UDim2.new(1, 0, 0.2, 0)
+        errorLbl.Position = UDim2.new(0, 0, 0, 0)
+        errorLbl.Text = "❌ 脚本 ["..scriptName.."] 未找到！"
+        errorLbl.TextColor3 = Color3.fromRGB(255, 0, 0)
+        errorLbl.BackgroundTransparency = 1
+        errorLbl.Parent = contentFrame
+    end
+end
+
+-- 给左侧每个按钮绑定点击事件
+for _, btnName in ipairs(scriptButtons) do
+    local btn = Instance.new("TextButton")
+    btn.Name = btnName
+    btn.Size = UDim2.new(1, 0, 0.1, 0) -- 高度10%，占满左侧宽度
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.Text = btnName
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Parent = scriptListFrame
+    btn.MouseButton1Click:Connect(function()
+        loadScript(btnName) -- 点击时执行加载逻辑
+    end)
+end
