@@ -1,0 +1,260 @@
+-- Roblox脚本中心 - 动态加载脚本界面
+-- 将本脚本放入StarterPlayerScripts中
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+-- 创建主界面
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ScriptHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- 主容器框架
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 400, 0, 500)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+-- 圆角效果
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = MainFrame
+
+-- 标题栏
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.Position = UDim2.new(0, 0, 0, 0)
+TitleBar.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(1, -20, 1, 0)
+TitleLabel.Position = UDim2.new(0, 10, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "孤月星新缝合脚本中心"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 18
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- 关闭按钮
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -35, 0.5, -15)
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
+CloseButton.BorderSizePixel = 0
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 14
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.Parent = TitleBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseButton
+
+-- 脚本列表容器
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Name = "ScrollFrame"
+ScrollFrame.Size = UDim2.new(1, -20, 1, -120)
+ScrollFrame.Position = UDim2.new(0, 10, 0, 50)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.ScrollBarThickness = 8
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.Parent = MainFrame
+
+local ScriptListLayout = Instance.new("UIListLayout")
+ScriptListLayout.Padding = UDim.new(0, 10)
+ScriptListLayout.Parent = ScrollFrame
+
+-- 底部提示区域
+local HintFrame = Instance.new("Frame")
+HintFrame.Name = "HintFrame"
+HintFrame.Size = UDim2.new(1, -20, 0, 60)
+HintFrame.Position = UDim2.new(0, 10, 1, -70)
+HintFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+HintFrame.BorderSizePixel = 0
+HintFrame.Parent = MainFrame
+
+local HintCorner = Instance.new("UICorner")
+HintCorner.CornerRadius = UDim.new(0, 6)
+HintCorner.Parent = HintFrame
+
+local HintLabel = Instance.new("TextLabel")
+HintLabel.Name = "HintLabel"
+HintLabel.Size = UDim2.new(1, -20, 1, -10)
+HintLabel.Position = UDim2.new(0, 10, 0, 5)
+HintLabel.BackgroundTransparency = 1
+HintLabel.Text = "💡 添加脚本指引：将自定义脚本放入「ReplicatedStorage/ScriptLoader」文件夹中即可自动加载"
+HintLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+HintLabel.TextSize = 12
+HintLabel.Font = Enum.Font.Gotham
+HintLabel.TextWrapped = true
+HintLabel.TextXAlignment = Enum.TextXAlignment.Left
+HintLabel.Parent = HintFrame
+
+-- 关闭按钮功能
+CloseButton.MouseButton1Click:Connect(function()
+    ScreenGui.Enabled = false
+end)
+
+-- 创建脚本按钮模板
+local function CreateScriptButton(scriptName, index)
+    local Button = Instance.new("TextButton")
+    Button.Name = "ScriptButton_" .. scriptName
+    Button.Size = UDim2.new(1, 0, 0, 50)
+    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+    Button.BorderSizePixel = 0
+    Button.Text = ""
+    
+    local ButtonCorner = Instance.new("UICorner")
+    ButtonCorner.CornerRadius = UDim.new(0, 6)
+    ButtonCorner.Parent = Button
+    
+    local ScriptNameLabel = Instance.new("TextLabel")
+    ScriptNameLabel.Name = "ScriptName"
+    ScriptNameLabel.Size = UDim2.new(1, -20, 0.6, 0)
+    ScriptNameLabel.Position = UDim2.new(0, 10, 0, 5)
+    ScriptNameLabel.BackgroundTransparency = 1
+    ScriptNameLabel.Text = scriptName
+    ScriptNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    ScriptNameLabel.TextSize = 14
+    ScriptNameLabel.Font = Enum.Font.GothamBold
+    ScriptNameLabel.TextXAlignment = Enum.TextXAlignment.Left
+    ScriptNameLabel.Parent = Button
+    
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Name = "Status"
+    StatusLabel.Size = UDim2.new(1, -20, 0.4, 0)
+    StatusLabel.Position = UDim2.new(0, 10, 0.6, 0)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Text = "点击加载脚本"
+    StatusLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    StatusLabel.TextSize = 12
+    StatusLabel.Font = Enum.Font.Gotham
+    StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    StatusLabel.Parent = Button
+    
+    -- 悬停效果
+    Button.MouseEnter:Connect(function()
+        Button.BackgroundColor3 = Color3.fromRGB(70, 70, 90)
+    end)
+    
+    Button.MouseLeave:Connect(function()
+        Button.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+    end)
+    
+    return Button
+end
+
+-- 加载脚本文件夹中的脚本
+local function LoadScripts()
+    -- 清空现有脚本列表
+    for _, child in ipairs(ScrollFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
+    end
+    
+    local ScriptLoaderFolder = ReplicatedStorage:FindFirstChild("ScriptLoader")
+    if not ScriptLoaderFolder then
+        -- 创建提示脚本文件夹
+        local HintButton = CreateScriptButton("未找到脚本文件夹", 1)
+        HintButton.Parent = ScrollFrame
+        
+        local Status = HintButton:FindFirstChild("Status")
+        if Status then
+            Status.Text = "请在ReplicatedStorage中创建ScriptLoader文件夹"
+            Status.TextColor3 = Color3.fromRGB(255, 100, 100)
+        end
+        return
+    end
+    
+    local scriptCount = 0
+    local totalHeight = 0
+    
+    for _, scriptObj in ipairs(ScriptLoaderFolder:GetChildren()) do
+        if scriptObj:IsA("ModuleScript") or scriptObj:IsA("Script") then
+            scriptCount = scriptCount + 1
+            
+            local Button = CreateScriptButton(scriptObj.Name, scriptCount)
+            Button.Parent = ScrollFrame
+            
+            totalHeight = totalHeight + 60
+            
+            -- 绑定点击事件
+            Button.MouseButton1Click:Connect(function()
+                local Status = Button:FindFirstChild("Status")
+                if Status then
+                    Status.Text = "执行中..."
+                    Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+                end
+                
+                -- 执行脚本逻辑
+                if scriptObj:IsA("ModuleScript") then
+                    local success, result = pcall(function()
+                        local module = require(scriptObj)
+                        if type(module) == "table" and module.Run then
+                            module.Run(player)
+                        end
+                        return true
+                    end)
+                    
+                    if Status then
+                        if success then
+                            Status.Text = "执行成功"
+                            Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+                        else
+                            Status.Text = "执行失败"
+                            Status.TextColor3 = Color3.fromRGB(255, 100, 100)
+                        end
+                    end
+                elseif scriptObj:IsA("Script") then
+                    -- 复制脚本到玩家GUI执行
+                    local newScript = scriptObj:Clone()
+                    newScript.Parent = player.PlayerGui
+                    
+                    if Status then
+                        Status.Text = "已加载到玩家GUI"
+                        Status.TextColor3 = Color3.fromRGB(100, 255, 100)
+                    end
+                end
+            end)
+        end
+    end
+    
+    -- 更新滚动区域大小
+    ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, totalHeight)
+    
+    if scriptCount == 0 then
+        local HintButton = CreateScriptButton("暂无可用脚本", 1)
+        HintButton.Parent = ScrollFrame
+        
+        local Status = HintButton:FindFirstChild("Status")
+        if Status then
+            Status.Text = "在ScriptLoader文件夹中添加脚本"
+            Status.TextColor3 = Color3.fromRGB(255, 200, 100)
+        end
+    end
+end
+
+-- 初始加载脚本
+LoadScripts()
+
+-- 定期检查脚本更新（每10秒）
+while true do
+    wait(10)
+    LoadScripts()
+end
